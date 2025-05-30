@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>性格診断テスト – MBTIバランス改良版</title>
+  <title>性格診断テスト</title>
   <style>
     body {
       font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
@@ -192,7 +192,7 @@
   </style>
 </head>
 <body>
-  <h1>性格診断テスト（MBTIバランス改良版）</h1>
+  <h1>性格診断テスト</h1>
   <p style="text-align:center;max-width:700px;margin:0 auto 28px;color:#444;">
   </p>
   <form id="quizForm"></form>
