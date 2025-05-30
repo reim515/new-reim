@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>性格診断テスト – Shindan0</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-bottom: 80px;
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 30px;
+    }
+    .options {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: space-between;
+    }
+    input[type=radio] {
+      display: none;
+    }
+    label.option-label {
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      flex: 1;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: .95rem;
+      cursor: pointer;
+      transition: .2s;
+      user-select: none;
+    }
+    label.option-label:hover {
+      background: #f3f3f3;
+    }
+    input[type=radio]:checked + label.option-label {
+      background: #2196F3;
+      color: #fff;
+      border-color: #2196F3;
+    }
+    #submitBtn {
+      margin: 30px auto;
+      display: block;
+      padding: 18px 40px;
+      font-size: 1.3rem;
+      border-radius: 10px;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #submitBtn:hover {
+      background: #388E3C;
+    }
+    #shareButtons {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    #lineShareBtn {
+      background-color: #00c300;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #lineShareBtn:hover {
+      background-color: #009900;
+    }
+    #xShareBtn {
+      background-color: #000000;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #xShareBtn:hover {
+      background-color: #333333;
+    }
+    #result {
+      margin-top: 30px;
+      font-weight: bold;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: .5s;
+    }
+    #result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #result img {
+      max-width: 150px;
+      margin: 10px 0;
+      display: block;
+    }
+    @media (max-width: 600px) {
+      .options {
+        flex-direction: column;
+      }
+      label.option-label {
+        flex: 1 1 auto;
+      }
+      #submitBtn {
+        width: 100%;
+        padding: 15px 0;
+        font-size: 1.2rem;
+      }
+      #shareButtons {
+        flex-direction: column;
+      }
+      #lineShareBtn, #xShareBtn {
+        width: 100%;
+        padding: 15px 0;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>性格診断テスト</h1>
+  <form id="quizForm"></form>
+  <div id="result"></div>
+
+  <script>
+    const questions = [
+      {text:"人と話すことでエネルギーが湧いてくる。", axis:"E"},
+      {text:"一人でいる時間が好きだ。", axis:"I"},
+      {text:"新しいアイデアにワクワクする。", axis:"N"},
+      {text:"実績のあるやり方を好む。", axis:"S"},
+      {text:"論理的に物事を判断する。", axis:"T"},
+      {text:"人の気持ちを優先して行動する。", axis:"F"},
+      {text:"計画を立ててから行動したい。", axis:"J"},
+      {text:"その場の流れに任せるのが好き。", axis:"P"},
+      {text:"話すよりも聞く方が多い。", axis:"I"},
+      {text:"現実的なことより未来の可能性を考える。", axis:"N"},
+      {text:"細かい事実や数字に注目する。", axis:"S"},
+      {text:"率直な意見をはっきり言うことが多い。", axis:"T"},
+      {text:"グループのリーダー役を任されることが多い。", axis:"L"},
+      {text:"人をサポートするのが得意だ。", axis:"S"},
+      {text:"自分の意見をしっかり主張できる。", axis:"A"},
+      {text:"意見の衝突を避け、協調を重視する。", axis:"C"},
+      {text:"新しい環境にもすぐに馴染める。", axis:"E"},
+      {text:"細かい作業が得意だ。", axis:"S"}
+    ];
+    const axisPairs = [
+      {l1:"外向的", k1:"E", l2:"内向的", k2:"I"},
+      {l1:"先進的", k1:"N", l2:"現実的", k2:"S"},
+      {l1:"論理的", k1:"T", l2:"共感的", k2:"F"},
+      {l1:"計画的", k1:"J", l2:"柔軟的", k2:"P"},
+      {l1:"リーダー型", k1:"L", l2:"サポーター型", k2:"S"},
+      {l1:"自己主張型", k1:"A", l2:"協調型", k2:"C"}
+    ];
+    const axisInfo = {
+      E:{img:"https://cdn.pixabay.com/photo/2016/03/31/19/57/people-1294474_1280.png", comment:"エネルギッシュで人と話すのが好き！"},
+      I:{img:"https://cdn.pixabay.com/photo/2021/01/28/19/06/lonely-5957977_1280.png", comment:"静かな時間が大好きなあなた。"},
+      N:{img:"https://cdn.pixabay.com/photo/2017/03/12/13/41/idea-2130084_1280.png", comment:"想像力豊かで未来志向です。"},
+      S:{img:"https://cdn.pixabay.com/photo/2014/04/03/10/32/eye-311754_1280.png", comment:"現実をしっかり見るタイプ。サポートも得意かも？"},
+      T:{img:"https://cdn.pixabay.com/photo/2014/03/25/16/54/human-297802_1280.png", comment:"冷静で理論的な思考の持ち主。"},
+      F:{img:"https://cdn.pixabay.com/photo/2017/10/25/17/51/heart-2889822_1280.png", comment:"人の気持ちに寄り添える優しさあり。"},
+      J:{img:"https://cdn.pixabay.com/photo/2017/07/06/06/55/agenda-2478067_1280.png", comment:"計画通りに進めたい慎重派。"},
+      P:{img:"https://cdn.pixabay.com/photo/2014/04/03/11/50/adventure-311945_1280.png", comment:"柔軟で自由な発想が魅力的！"},
+      L:{img:"https://cdn.pixabay.com/photo/2016/03/31/19/57/team-1294675_1280.png", comment:"リーダーシップを発揮できるタイプ。"},
+      A:{img:"https://cdn.pixabay.com/photo/2016/11/29/08/41/debate-1868751_1280.png", comment:"自分の意見をしっかり主張できる。"},
+      C:{img:"https://cdn.pixabay.com/photo/2016/11/29/08/41/handshake-1868750_1280.png", comment:"協調性が高く、チームワークが得意。"}
+    };
+    questions.sort(() => Math.random() - 0.5);
+    const form = document.getElementById("quizForm");
+    questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `
+        <p>${i+1}. ${q.text}</p>
+        <div class="options">
+          ${[5,4,3,2,1].map(v => {
+            const id = `q${i}_${v}`;
+            const lbl = ["とてもあてはまる","あてはまる","どちらでもない","あてはまらない", "全くあてはまらない"][5-v];
+            return `
+              <input type="radio" id="${id}" name="q${i}" value="${v}">
+              <label class="option-label" for="${id}">${lbl}</label>`;
+          }).join('')}
+        </div>`;
+      form.appendChild(div);
+    });
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "診断する";
+    btn.id = "submitBtn";
+    form.appendChild(btn);
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const resultBox = document.getElementById("result");
+      const unanswered = questions.some((_, i) => !document.querySelector(`input[name="q${i}"]:checked`));
+      if (unanswered) {
+        resultBox.innerHTML = '<span style="color:#d32f2f;">未回答の質問があります。すべて回答してください。</span>';
+        resultBox.classList.add("show");
+        return;
+      }
+      const score = {E:0, I:0, N:0, S:0, T:0, F:0, J:0, P:0, L:0, A:0, C:0};
+      questions.forEach((q, i) => {
+        const val = parseInt(document.querySelector(`input[name="q${i}"]:checked`).value);
+        score[q.axis] += val;
+      });
+      let html = `<div style="text-align:center;margin-bottom:20px;">
+        <img src="https://cdn.pixabay.com/photo/2018/03/10/12/00/teamwork-3213924_1280.jpg" alt="診断結果イメージ" style="max-width:300px;">
+      </div>
+      <p>診断結果：</p><ul>`;
+      axisPairs.forEach(p => {
+        const v1 = score[p.k1], v2 = score[p.k2];
+        if (v1 === v2) {
+          html += `<li>${p.l1}と${p.l2}の中間的な傾向です（${v1}:${v2}）</li>`;
+          return;
+        }
+        const k = v1 > v2 ? p.k1 : p.k2;
+        const label = v1 > v2 ? p.l1 : p.l2;
+        const info = axisInfo[k];
+        html += `
+          <li><strong>${label}</strong><br>
+          <img src="${info.img}" alt="${label}">
+          <br>${info.comment}（${v1}:${v2}）</li>`;
+      });
+      html += "</ul>";
+      html += `
+        <div id="shareButtons">
+          <button id="lineShareBtn" type="button">結果をLINEで共有</button>
+          <button id="xShareBtn" type="button">結果をXで共有</button>
+        </div>
+      `;
+      resultBox.innerHTML = html;
+      resultBox.classList.add("show");
+      const lineBtn = document.getElementById("lineShareBtn");
+      const xBtn = document.getElementById("xShareBtn");
+      const shareText = encodeURIComponent("性格診断テストの結果をチェックしてみてください！");
+      const shareUrl = encodeURIComponent(window.location.href);
+      lineBtn.onclick = () => {
+        const lineUrl = `https://line.me/R/msg/text/?${shareText}%20${shareUrl}`;
+        window.open(lineUrl, "_blank");
+      };
+      xBtn.onclick = () => {
+        const xUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+        window.open(xUrl, "_blank");
+      };
+    });
+  </script>
+</body>
+</html>
