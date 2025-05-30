@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>性格診断テスト – Shindan1</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
+      background-color: #f4f4f9;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 2rem;
+      background-color: #fff;
+      padding: 1.2rem;
+      border-radius: 0.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .options {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+      justify-content: space-between;
+    }
+    input[type=radio] {
+      display: none;
+    }
+    label.option-label {
+      background: #f0f7fa;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.7rem 0.5rem;
+      flex: 1;
+      min-width: 0;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1rem;
+      font-family: inherit;
+      font-weight: 500;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, transform 0.1s;
+      user-select: none;
+      margin: 0.3rem 0;
+    }
+    label.option-label:hover {
+      background: #e0f2f1;
+      color: #2196F3;
+      transform: translateY(-2px) scale(1.03);
+    }
+    input[type=radio]:checked + label.option-label {
+      background: #2196F3;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(33,150,243,0.12);
+      transform: scale(1.04);
+    }
+    #submitBtn {
+      margin: 36px auto 0 auto;
+      display: block;
+      padding: 18px 44px;
+      font-size: 1.25rem;
+      font-family: inherit;
+      font-weight: bold;
+      border-radius: 1rem;
+      background: linear-gradient(90deg, #4caf50 60%, #90ee90 100%);
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(76,175,80,0.10);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    #submitBtn:hover {
+      background: linear-gradient(90deg, #43a047 60%, #a5d6a7 100%);
+      transform: scale(1.04);
+    }
+    #result {
+      margin-top: 30px;
+      font-weight: bold;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: .5s;
+    }
+    #result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .result-category {
+      margin-bottom: 2rem;
+      padding: 1.2rem 1rem 1rem 1rem;
+      border-left: 7px solid;
+      border-radius: 0.75rem;
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+      background-color: #fff7;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-category::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top:0;left:0;right:0;bottom:0;
+      background: inherit;
+      opacity: 0.10;
+      z-index: 0;
+    }
+    .result-category > * {
+      position: relative;
+      z-index: 1;
+    }
+    .result-category h3 {
+      margin:0 0 0.5rem 0;
+      font-size:1.2rem;
+      font-weight: bold;
+    }
+    .result-category .result-value {
+      font-size:1.3rem;
+      font-weight:bold;
+      margin-bottom:0.3rem;
+    }
+    .result-category .result-detail {
+      font-size:1rem;
+      line-height: 1.6;
+    }
+    .share-button {
+      margin: 0.5rem;
+      display: inline-block;
+      padding: 0.7rem 1.6rem;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-size: 1.15rem;
+      font-family: inherit;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.2s, filter 0.2s;
+    }
+    .share-button.line-share {
+      background-color: #00c300;
+    }
+    .share-button.x-share {
+      background-color: #000;
+    }
+    .share-button:hover {
+      filter: brightness(0.92);
+    }
+    @media (max-width: 600px) {
+      .options {
+        flex-direction: column;
+      }
+      label.option-label {
+        flex: 1 1 auto;
+      }
+      #submitBtn {
+        width: 100%;
+        padding: 15px 0;
+        font-size: 1.1rem;
+      }
+      .share-button {
+        width: 100%;
+        padding: 1rem 0;
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>性格診断テスト</h1>
+  <form id="quizForm"></form>
+  <div id="result"></div>
+
+  <script>
+    // 質問・診断軸データ
+    const questions = [
+      {text:"人と話すことでエネルギーが湧いてくる。", axis:"E"},
+      {text:"一人でいる時間が好きだ。", axis:"I"},
+      {text:"新しいアイデアにワクワクする。", axis:"N"},
+      {text:"実績のあるやり方を好む。", axis:"S"},
+      {text:"論理的に物事を判断する。", axis:"T"},
+      {text:"人の気持ちを優先して行動する。", axis:"F"},
+      {text:"計画を立ててから行動したい。", axis:"J"},
+      {text:"その場の流れに任せるのが好き。", axis:"P"},
+      {text:"話すよりも聞く方が多い。", axis:"I"},
+      {text:"現実的なことより未来の可能性を考える。", axis:"N"},
+      {text:"細かい事実や数字に注目する。", axis:"S"},
+      {text:"率直な意見をはっきり言うことが多い。", axis:"T"},
+      {text:"グループのリーダー役を任されることが多い。", axis:"L"},
+      {text:"人をサポートするのが得意だ。", axis:"S"},
+      {text:"自分の意見をしっかり主張できる。", axis:"A"},
+      {text:"意見の衝突を避け、協調を重視する。", axis:"C"},
+      {text:"新しい環境にもすぐに馴染める。", axis:"E"},
+      {text:"細かい作業が得意だ。", axis:"S"}
+    ];
+
+    // 質問ランダム
+    questions.sort(() => Math.random() - 0.5);
+
+    // 質問フォーム生成
+    const form = document.getElementById("quizForm");
+    questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `
+        <p>${i+1}. ${q.text}</p>
+        <div class="options">
+          ${[5,4,3,2,1].map(v => {
+            // ラベル配列の5番目を「まったく当てはまらない」に変更
+            const id = `q${i}_${v}`;
+            const lbl = ["とてもあてはまる","あてはまる","どちらでもない","あてはまらない","まったく当てはまらない"][5-v];
+            return `
+              <input type="radio" id="${id}" name="q${i}" value="${v}">
+              <label class="option-label" for="${id}">${lbl}</label>`;
+          }).join('')}
+        </div>`;
+      form.appendChild(div);
+    });
+
+    // 診断ボタン
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "診断する";
+    btn.id = "submitBtn";
+    form.appendChild(btn);
+
+    // 診断結果画面（paste.txt風）
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      showResult();
+    });
+
+    function showResult() {
+      // スコア初期化
+      const score = {E:0, I:0, N:0, S:0, T:0, F:0, J:0, P:0, L:0, A:0, C:0};
+      let allAnswered = true;
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected) {
+          score[q.axis] += parseInt(selected.value);
+        } else {
+          allAnswered = false;
+        }
+      });
+      const resultBox = document.getElementById("result");
+      if (!allAnswered) {
+        resultBox.innerHTML = '<span style="color:#d32f2f;">すべての質問に回答してください。</span>';
+        resultBox.classList.add("show");
+        return;
+      }
+
+      // 各軸の結果をまとめる
+      const results = [
+        {
+          title: "外向・内向",
+          value: score.E >= score.I ? "外向的" : "内向的",
+          detail: score.E >= score.I ? "あなたは社交的で、人と関わることでエネルギーを得るタイプです。" : "あなたは静かな環境や一人の時間を大切にするタイプです。",
+          color: score.E >= score.I ? "#ffe082" : "#b3e5fc",
+          image: score.E >= score.I ? "🗣️" : "📚"
+        },
+        {
+          title: "先進・現実",
+          value: score.N >= score.S ? "先進的" : "現実的",
+          detail: score.N >= score.S ? "あなたは新しいアイデアや挑戦を好み、革新的な思考を持っています。" : "あなたは安定や伝統を大切にし、着実な考え方をします。",
+          color: score.N >= score.S ? "#c5e1a5" : "#d7ccc8",
+          image: score.N >= score.S ? "🚀" : "🏡"
+        },
+        {
+          title: "論理・共感",
+          value: score.T >= score.F ? "論理的" : "共感的",
+          detail: score.T >= score.F ? "あなたは冷静で論理的な判断を重視します。" : "あなたは人の気持ちを大切にし、共感を重視します。",
+          color: score.T >= score.F ? "#b2dfdb" : "#f8bbd0",
+          image: score.T >= score.F ? "🧠" : "💗"
+        },
+        {
+          title: "計画・柔軟",
+          value: score.J >= score.P ? "計画的" : "柔軟的",
+          detail: score.J >= score.P ? "あなたは計画を立てて物事を進めるのが得意です。" : "あなたは状況に応じて柔軟に対応できます。",
+          color: score.J >= score.P ? "#d1c4e9" : "#ffe0b2",
+          image: score.J >= score.P ? "🗂️" : "🌊"
+        },
+        {
+          title: "リーダー・サポーター",
+          value: score.L >= score.S ? "リーダー型" : "サポーター型",
+          detail: score.L >= score.S ? "あなたは周囲を引っ張る力があり、リーダーシップを発揮します。" : "あなたは他者を支えることに長けていて、協調性が高いです。",
+          color: score.L >= score.S ? "#ffccbc" : "#dcedc8",
+          image: score.L >= score.S ? "👑" : "🧰"
+        },
+        {
+          title: "自己主張・協調",
+          value: score.A >= score.C ? "自己主張型" : "協調型",
+          detail: score.A >= score.C ? "あなたは自分の意見をしっかり主張できます。" : "あなたは周囲と協調しながら物事を進めるタイプです。",
+          color: score.A >= score.C ? "#b3e5fc" : "#f0f4c3",
+          image: score.A >= score.C ? "🗯️" : "🤝"
+        }
+      ];
+
+      // 結果HTML生成
+      resultBox.innerHTML =
+        `<h2 style="text-align:center;margin-bottom:2rem;">あなたの診断結果</h2>` +
+        results.map(r => `
+          <div class="result-category" style="
+            border-left: 7px solid ${r.color};
+            background-color: ${r.color}33;
+            background-image: url('https://source.unsplash.com/400x200/?${encodeURIComponent(r.value)}');
+            ">
+            <h3>${r.image} ${r.title}</h3>
+            <div class="result-value">${r.value}</div>
+            <div class="result-detail">${r.detail}</div>
+          </div>
+        `).join('') +
+        `<div style="text-align:center;margin-top:2.5rem;">
+          <a class="share-button x-share" href="https://twitter.com/intent/tweet?text=私の性格診断結果！%0A${encodeURIComponent(results.map(r=>r.title+'：'+r.value).join('%0A'))}" target="_blank">X（旧Twitter）で診断結果をシェア</a>
+          <a class="share-button line-share" href="https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(results.map(r=>`${r.title}：${r.value}`).join('%0A'))}" target="_blank">LINEで診断結果をシェア</a>
+        </div>`;
+      resultBox.classList.add("show");
+    }
+  </script>
+</body>
+</html>
