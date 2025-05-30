@@ -34,15 +34,16 @@
     label.option-label {
       background: #f0f7fa;
       border: none;
-      border-radius: 0.7rem;
-      padding: 1rem 0.5rem;
+      border-radius: 0.5rem;
+      padding: 0.7rem 0.5rem;
       flex: 1;
-      min-height: 54px;
+      min-width: 0;
+      min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 1.08rem;
+      font-size: 1rem;
       font-family: inherit;
       font-weight: 500;
       color: #333;
@@ -50,6 +51,7 @@
       cursor: pointer;
       transition: background 0.18s, color 0.18s, transform 0.1s;
       user-select: none;
+      margin: 0.3rem 0;
     }
     label.option-label:hover {
       background: #e0f2f1;
@@ -92,7 +94,6 @@
       opacity: 1;
       transform: translateY(0);
     }
-    /* paste.txt風 診断結果カード */
     .result-category {
       margin-bottom: 2rem;
       padding: 1.2rem 1rem 1rem 1rem;
@@ -321,7 +322,7 @@
           </div>
         `).join('') +
         `<div style="text-align:center;margin-top:2.5rem;">
-          <a class="share-button x-share" href="https://twitter.com/intent/tweet?text=私の性格診断結果！%0A${encodeURIComponent(results.map(r=>r.title+'：'+r.value).join('%0A'))}" target="_blank">X(旧Twitter)で診断結果をシェア</a>
+          <a class="share-button x-share" href="https://twitter.com/intent/tweet?text=私の性格診断結果！%0A${encodeURIComponent(results.map(r=>r.title+'：'+r.value).join('%0A'))}" target="_blank">X（旧Twitter）で診断結果をシェア</a>
           <a class="share-button line-share" href="https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(results.map(r=>`${r.title}：${r.value}`).join('%0A'))}" target="_blank">LINEで診断結果をシェア</a>
         </div>`;
       resultBox.classList.add("show");
