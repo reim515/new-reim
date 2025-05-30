@@ -194,9 +194,6 @@
 <body>
   <h1>性格診断テスト（MBTIバランス改良版）</h1>
   <p style="text-align:center;max-width:700px;margin:0 auto 28px;color:#444;">
-    16タイプ診断の信頼性向上のため、各軸8問・全32問に拡張。<br>
-    具体的なシチュエーションを盛り込んだ質問と、バランス型（中間型）も判定できるようにしました。<br>
-    結果では強み・弱み・向いている仕事・有名人例も表示されます。
   </p>
   <form id="quizForm"></form>
   <div id="result"></div>
