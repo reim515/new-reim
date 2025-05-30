@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>性格診断テスト – MBTI改良版</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
+      background-color: #f4f4f9;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 2rem;
+      background-color: #fff;
+      padding: 1.2rem;
+      border-radius: 0.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .options {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+      justify-content: space-between;
+    }
+    input[type=radio] {
+      position: absolute;
+      left: -9999px;
+    }
+    label.option-label {
+      background: #f0f7fa;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.7rem 0.5rem;
+      flex: 1;
+      min-width: 0;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1rem;
+      font-family: inherit;
+      font-weight: 500;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, transform 0.1s;
+      user-select: none;
+      margin: 0.3rem 0;
+    }
+    label.option-label:hover, label.option-label:focus {
+      background: #e0f2f1;
+      color: #2196F3;
+      transform: translateY(-2px) scale(1.03);
+      outline: 2px solid #2196F3;
+    }
+    input[type=radio]:checked + label.option-label {
+      background: #2196F3;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(33,150,243,0.12);
+      transform: scale(1.04);
+    }
+    #submitBtn {
+      margin: 36px auto 0 auto;
+      display: block;
+      padding: 18px 44px;
+      font-size: 1.25rem;
+      font-family: inherit;
+      font-weight: bold;
+      border-radius: 1rem;
+      background: linear-gradient(90deg, #4caf50 60%, #90ee90 100%);
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(76,175,80,0.10);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    #submitBtn:hover {
+      background: linear-gradient(90deg, #43a047 60%, #a5d6a7 100%);
+      transform: scale(1.04);
+    }
+    #result {
+      margin-top: 30px;
+      font-weight: bold;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: .5s;
+    }
+    #result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .result-category {
+      margin-bottom: 2rem;
+      padding: 1.2rem 1rem 1rem 1rem;
+      border-left: 7px solid;
+      border-radius: 0.75rem;
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+      background-color: #fff7;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-category::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top:0;left:0;right:0;bottom:0;
+      background: inherit;
+      opacity: 0.10;
+      z-index: 0;
+    }
+    .result-category > * {
+      position: relative;
+      z-index: 1;
+    }
+    .result-category h3 {
+      margin:0 0 0.5rem 0;
+      font-size:1.2rem;
+      font-weight: bold;
+    }
+    .result-category .result-value {
+      font-size:1.3rem;
+      font-weight:bold;
+      margin-bottom:0.3rem;
+    }
+    .result-category .result-detail {
+      font-size:1rem;
+      line-height: 1.6;
+    }
+    .share-button {
+      margin: 0.5rem;
+      display: inline-block;
+      padding: 0.7rem 1.6rem;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-size: 1.15rem;
+      font-family: inherit;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.2s, filter 0.2s;
+    }
+    .share-button.line-share {
+      background-color: #00c300;
+    }
+    .share-button.x-share {
+      background-color: #000;
+    }
+    .share-button:hover {
+      filter: brightness(0.92);
+    }
+    @media (max-width: 600px) {
+      .options {
+        flex-direction: column;
+      }
+      label.option-label {
+        flex: 1 1 auto;
+      }
+      #submitBtn {
+        width: 100%;
+        padding: 15px 0;
+        font-size: 1.1rem;
+      }
+      .share-button {
+        width: 100%;
+        padding: 1rem 0;
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>性格診断テスト（MBTIバランス版）</h1>
+  <form id="quizForm"></form>
+  <div id="result"></div>
+
+  <script>
+    // MBTI 4軸・各4問ずつ
+    const questions = [
+      // E/I
+      {text:"人と話すことでエネルギーが湧いてくる。", axis:"E"},
+      {text:"一人でいる時間が好きだ。", axis:"I"},
+      {text:"初対面でも物怖じしない。", axis:"E"},
+      {text:"静かな場所で過ごすのが落ち着く。", axis:"I"},
+      // N/S
+      {text:"新しいアイデアにワクワクする。", axis:"N"},
+      {text:"実績のあるやり方を好む。", axis:"S"},
+      {text:"未来の可能性を考えることが多い。", axis:"N"},
+      {text:"具体的な事実や数字に注目する。", axis:"S"},
+      // T/F
+      {text:"論理的に物事を判断する。", axis:"T"},
+      {text:"人の気持ちを優先して行動する。", axis:"F"},
+      {text:"率直な意見をはっきり言うことが多い。", axis:"T"},
+      {text:"相手の気持ちを考えて発言する。", axis:"F"},
+      // J/P
+      {text:"計画を立ててから行動したい。", axis:"J"},
+      {text:"その場の流れに任せるのが好き。", axis:"P"},
+      {text:"スケジュール通りに動くのが得意。", axis:"J"},
+      {text:"予定変更にも柔軟に対応できる。", axis:"P"}
+    ];
+
+    // 質問ランダム
+    questions.sort(() => Math.random() - 0.5);
+
+    // 質問フォーム生成
+    const form = document.getElementById("quizForm");
+    questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `
+        <p>${i+1}. ${q.text}</p>
+        <div class="options">
+          ${[5,4,3,2,1].map(v => {
+            const id = `q${i}_${v}`;
+            const lbl = ["とてもあてはまる","あてはまる","どちらでもない","あてはまらない","まったく当てはまらない"][5-v];
+            return `
+              <input type="radio" id="${id}" name="q${i}" value="${v}" aria-label="${lbl}">
+              <label class="option-label" for="${id}" tabindex="0">${lbl}</label>`;
+          }).join('')}
+        </div>`;
+      form.appendChild(div);
+    });
+
+    // 診断ボタン
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "診断する";
+    btn.id = "submitBtn";
+    form.appendChild(btn);
+
+    // 診断結果画面
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      showResult();
+    });
+
+    function showResult() {
+      // スコア初期化
+      const score = {E:0, I:0, N:0, S:0, T:0, F:0, J:0, P:0};
+      const count = {E:0, I:0, N:0, S:0, T:0, F:0, J:0, P:0};
+      let allAnswered = true;
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected) {
+          score[q.axis] += parseInt(selected.value);
+          count[q.axis]++;
+        } else {
+          allAnswered = false;
+        }
+      });
+      const resultBox = document.getElementById("result");
+      if (!allAnswered) {
+        resultBox.innerHTML = '<span style="color:#d32f2f;">すべての質問に回答してください。</span>';
+        resultBox.classList.add("show");
+        return;
+      }
+
+      // 各軸の平均値で判定
+      const axisAvg = {};
+      for(const key in score) {
+        axisAvg[key] = score[key] / count[key];
+      }
+
+      // MBTIタイプ算出
+      const mbti =
+        (axisAvg.E >= axisAvg.I ? "E" : "I") +
+        (axisAvg.N >= axisAvg.S ? "N" : "S") +
+        (axisAvg.T >= axisAvg.F ? "T" : "F") +
+        (axisAvg.J >= axisAvg.P ? "J" : "P");
+
+      // 結果説明
+      const typeDesc = {
+        "E": "外向的：人と関わることでエネルギーを得ます。",
+        "I": "内向的：静かな環境や一人の時間を大切にします。",
+        "N": "直感型：新しいアイデアや可能性を重視します。",
+        "S": "感覚型：現実的で具体的な事実を重視します。",
+        "T": "思考型：論理的・客観的に判断します。",
+        "F": "感情型：人の気持ちや共感を重視します。",
+        "J": "判断型：計画的に物事を進めるのが得意です。",
+        "P": "知覚型：柔軟に状況に対応できます。"
+      };
+
+      // 結果HTML生成
+      resultBox.innerHTML =
+        `<h2 style="text-align:center;margin-bottom:2rem;">あなたのMBTIタイプは <span style="font-size:2rem">${mbti}</span> です</h2>` +
+        mbti.split('').map((c, idx) => `
+          <div class="result-category" style="
+            border-left: 7px solid #2196F3;
+            background-color: #e3f2fd;
+            background-image: url('https://source.unsplash.com/400x200/?${encodeURIComponent(
+              c === "E" ? "extrovert" :
+              c === "I" ? "introvert" :
+              c === "N" ? "idea" :
+              c === "S" ? "realistic" :
+              c === "T" ? "logic" :
+              c === "F" ? "empathy" :
+              c === "J" ? "plan" :
+              "flexible"
+            )}');
+            ">
+            <h3>${c}</h3>
+            <div class="result-value">${typeDesc[c].split("：")[0]}</div>
+            <div class="result-detail">${typeDesc[c].split("：")[1]}</div>
+          </div>
+        `).join('') +
+        `<div style="text-align:center;margin-top:2.5rem;">
+          <a class="share-button x-share" href="https://twitter.com/intent/tweet?text=私のMBTI診断結果は${mbti}でした！" target="_blank">X（旧Twitter）で診断結果をシェア</a>
+          <a class="share-button line-share" href="https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(location.href)}&text=私のMBTI診断結果は${mbti}でした！" target="_blank">LINEで診断結果をシェア</a>
+        </div>`;
+      resultBox.classList.add("show");
+    }
+  </script>
+</body>
+</html>
