@@ -571,7 +571,6 @@
             <a class="share-btn line" href="https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}" target="_blank">${data.share.line}</a>
             <a class="share-btn facebook" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank">${data.share.facebook}</a>
             <button class="share-btn instagram" onclick="copyToClipboard('${shareText}\\n${shareUrl}','${lang==="ja"?"Instagramに貼り付けてシェアしてください":"Copy and paste to Instagram"}');return false;">${data.share.instagram}</button>
-            
             <button class="share-btn copy" onclick="copyToClipboard('${shareText}\\n${shareUrl}','${lang==="ja"?"結果をコピーしました":"Copied!"}');return false;">${data.share.copy}</button>
           </div>
         `;
