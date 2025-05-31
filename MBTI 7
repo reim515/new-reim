@@ -168,7 +168,7 @@
           { text: "自分の考えをはっきり伝える", img: "📢", axis: "T" }
         ],
         // ↓↓↓ 回答ボタン文言を変更
-        options: ["あてはまる","ややあてはまる","どちらでもない","ややあてはまらない","あてはまらない"],
+        options: ["あてはまる","ややあてはまる","どちらでもない","あまりあてはまらない","あてはまらない"],
         next: "次のページ",
         prev: "前のページ",
         submit: "診断する",
@@ -178,10 +178,10 @@
           line: "LINEでシェア",
           facebook: "Facebookでシェア",
           instagram: "Instagramでシェア",
-          threads: "Threadsでシェア",
+        
           copy: "結果をコピー"
         },
-        error: "すべての質問に回答してください。未回答の設問が赤くハイライトされています。",
+        error: "すべての質問に回答してください。",
         clear: "保存データをクリア",
         resultNote: "※MBTI診断は性格の良し悪しを決めるものではありません。あなたの傾向や強みを知るための参考としてご活用ください。",
         remain: n => `あと${n}問`,
@@ -571,7 +571,7 @@
             <a class="share-btn line" href="https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}" target="_blank">${data.share.line}</a>
             <a class="share-btn facebook" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank">${data.share.facebook}</a>
             <button class="share-btn instagram" onclick="copyToClipboard('${shareText}\\n${shareUrl}','${lang==="ja"?"Instagramに貼り付けてシェアしてください":"Copy and paste to Instagram"}');return false;">${data.share.instagram}</button>
-            <button class="share-btn threads" onclick="copyToClipboard('${shareText}\\n${shareUrl}','${lang==="ja"?"Threadsに貼り付けてシェアしてください":"Copy and paste to Threads"}');return false;">${data.share.threads}</button>
+            
             <button class="share-btn copy" onclick="copyToClipboard('${shareText}\\n${shareUrl}','${lang==="ja"?"結果をコピーしました":"Copied!"}');return false;">${data.share.copy}</button>
           </div>
         `;
