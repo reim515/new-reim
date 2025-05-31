@@ -573,7 +573,7 @@
             <button class="share-btn copy" onclick="copyToClipboard('${shareText}\\n${shareUrl}','${lang==="ja"?"結果をコピーしました":"Copied!"}');return false;">${data.share.copy}</button>
           </div>
         `;
-        window.scrollTo({top:0, behavior:"smooth"});
+       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
         return true;
       }
       return false;
